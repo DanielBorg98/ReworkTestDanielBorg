@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('product_categories', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('product_id');
+            $table->foreignId('category_id');
+            $table->timestamps(); 
         });
     }
 
