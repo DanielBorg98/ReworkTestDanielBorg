@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductRequest; 
+use App\Models\Category; 
 use App\Models\Product; 
 use Illuminate\Http\Request; 
+use Illuminate\Support\Facades\DB; 
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -19,17 +22,26 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
+    public function create() 
+    { 
+        return Inertia::render('products/create', ['categories' => Category::all()]); 
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(ProductRequest $request) 
+    { 
+        try { 
+            $product = DB::transaction(function () use ($request) { 
+                $product = Product::create($request->validated());
+                $categories = $request->get('categories'); 
+                $product->categories()->sync($categories); 
+            });  
+            return redirect()->back(); 
+        } catch (\Exception $e) { 
+            return redirect()->back()->withErrors(''); 
+        } 
     }
 
     /**
